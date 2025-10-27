@@ -1,0 +1,22 @@
+# Ignore all log files
+*.log
+
+# Ignore all compiled Java classes
+*.class
+
+# Ignore Maven target folder
+target/
+**/target/
+
+# Ignore local IDE configs
+.idea/
+**/.idea/
+/*.iml
+
+# Ignore OS-specific files
+.DS_Store
+Thumbs.db
+
+# Ignore temporary files
+*.tmp
+*.swp

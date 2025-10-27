@@ -14,6 +14,10 @@ docker build -t local/file-node:latest ./filenode
 echo "🚀 Building filemapper image..."
 docker build -t local/filemapper:latest ./filemapper
 
+# Build storage-service image
+echo "🚀 Building storage-service image..."
+docker build -t local/storage-service:latest ./storage-service
+
 echo "✅ All images built successfully!"
 echo ""
 echo "To verify, run:"
@@ -37,4 +41,11 @@ kubectl delete pod -l app=file-node
 echo "🔄 Deleting and recreating pods: filemapper"
 kubectl delete pod -l app=filemapper
 
+echo "🔄 Deleting and recreating pods: storage-service"
+kubectl delete pod -l app=storage-service
+
 echo "✅ All services restarted with latest images."
+
+echo "🌀 Exposing storage service to outside world to test apis"
+
+kubectl port-forward svc/storage-service 8080:8080

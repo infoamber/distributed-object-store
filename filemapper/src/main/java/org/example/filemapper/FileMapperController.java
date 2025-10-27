@@ -26,6 +26,10 @@ public class FileMapperController {
     return nodes;
   }
 
+  /*
+    Returns nodes address, where file should be kept of read from.
+    TODO : Update logic to return replica nodes as well.
+   */
   @GetMapping("/getNodeForFile")
   public String getNodeForFile(@RequestParam(name = "filename", required = true) String filename) {
     // Currently a simple implementation to decide node based on fileName
