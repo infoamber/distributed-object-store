@@ -1,0 +1,53 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: file-node
+spec:
+  clusterIP: None          # Headless for stable DNS
+  selector:
+    app: file-node
+  ports:
+    - port: 8080
+      targetPort: 8080
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: file-node
+spec:
+  serviceName: "file-node"
+  replicas: 3
+  selector:
+    matchLabels:
+      app: file-node
+  template:
+    metadata:
+      labels:
+        app: file-node
+    spec:
+      containers:
+        - name: file-node
+          image: local/file-node:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8080
+          env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: DATA_BASE_PATH
+              value: /data
+          volumeMounts:
+            - name: file-node-storage
+              mountPath: /data
+              subPathExpr: $(POD_NAME)
+  volumeClaimTemplates:
+    - metadata:
+        name: file-node-storage
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        resources:
+          requests:
+            storage: 1Gi

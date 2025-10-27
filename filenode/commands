@@ -1,0 +1,21 @@
+mvn spring-boot:run
+
+# First time
+docker build -t local/file-node:latest .
+kubectl apply -f k8s-file-node.yaml
+kubectl get pods -l app=file-node -o wide
+
+# Redeploy
+docker build -t local/file-node:latest .
+kubectl rollout restart statefulset/file-node
+kubectl get pods -l app=file-node -o wide
+
+
+kubectl port-forward pod/file-node-0 8081:8080
+kubectl port-forward pod/file-node-1 8082:8080
+kubectl port-forward pod/file-node-2 8083:8080
+
+
+kubectl delete statefulset file-node
+kubectl delete pv file-node-pv
+kubectl delete pvc -l app=file-node
