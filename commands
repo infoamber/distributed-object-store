@@ -7,6 +7,8 @@ kubectl get pods -l app=file-node -o wide
 
 # Redeploy
 docker build -t local/file-node:latest .
+docker build -t local/filemapper:latest .
+
 kubectl rollout restart statefulset/file-node
 kubectl get pods -l app=file-node -o wide
 
