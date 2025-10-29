@@ -21,3 +21,9 @@ kubectl port-forward pod/file-node-2 8083:8080
 kubectl delete statefulset file-node
 kubectl delete pv file-node-pv
 kubectl delete pvc -l app=file-node
+
+
+kubectl get statefulset file-node -n default
+
+# Scale down to 2 (if you have 3 replicas)
+kubectl scale statefulset file-node --replicas=2 -n default

@@ -16,24 +16,34 @@ public class StorageService {
   @Autowired
   private final FileNodeAccessor fileNodeAccessor;
 
-  public StorageService(FileMapperAccessor fileMapperAccessor, FileNodeAccessor fileNodeAccessor) {
+  @Autowired
+  private final FileNodeClusterService fileNodeClusterService;
+
+  @Autowired
+  private final FileNodeServiceDiscovery fileNodeServiceDiscovery;
+
+  public StorageService(FileMapperAccessor fileMapperAccessor, FileNodeAccessor fileNodeAccessor, FileNodeClusterService fileNodeClusterService, FileNodeServiceDiscovery fileNodeServiceDiscovery) {
     this.fileMapperAccessor = fileMapperAccessor;
     this.fileNodeAccessor = fileNodeAccessor;
+    this.fileNodeClusterService = fileNodeClusterService;
+    this.fileNodeServiceDiscovery = fileNodeServiceDiscovery;
   }
 
   public String writeJson(String filename, String json) {
-    String nodeAddress = fileMapperAccessor.getNodeUrlForFile(filename);
+    String nodeID = fileMapperAccessor.getNodeIdForFile(filename);
+    String nodeAddress = fileNodeServiceDiscovery.fetchNodeAddress(nodeID);
     fileNodeAccessor.writeJson(filename, json, nodeAddress);
     return "Data written to node : " + nodeAddress;
   }
 
   public String readFile(String filename) {
-    String nodeAddress = fileMapperAccessor.getNodeUrlForFile(filename);
+    String nodeID = fileMapperAccessor.getNodeIdForFile(filename);
+    String nodeAddress = fileNodeServiceDiscovery.fetchNodeAddress(nodeID);
     return fileNodeAccessor.readFile(filename, nodeAddress);
   }
 
   public Map<String, List<String>> getAllFiles() {
-    List<String> nodeAddresses = fileMapperAccessor.getAllNodeUrlForFiles();
+    List<String> nodeAddresses = fileNodeClusterService.getAllHealthyNodesAddresses();
     Map<String, List<String>> allFiles = new HashMap<>();
     for (String nodeAddress: nodeAddresses) {
       List<String> files = fileNodeAccessor.fetchAllFilesList(nodeAddress);

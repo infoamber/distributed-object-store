@@ -1,0 +1,12 @@
+1. If i remove a replica. I get error for few seconds. May be due to zookeeper get updated cluster maps in few seconds.
+ until it returns dead node as well in the list. what can be it;s consequence and how it can be handled.
+
+ 2. Take care, how adding or removing nodes will work with new files added and existing files as well.
+
+ 3. distributed tracing of logs. All logs at one place.
+
+
+
+
+
+

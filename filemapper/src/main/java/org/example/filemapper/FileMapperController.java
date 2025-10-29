@@ -1,11 +1,17 @@
 package org.example.filemapper;
+import org.example.filemapper.accessor.ZookeeperAccessor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 public class FileMapperController {
+
+  @Autowired
+  private final ZookeeperAccessor zookeeperAccessor;
 
   /*
     Currently  this is hardcoded values as per configuration and pods in File node service.
@@ -16,14 +22,19 @@ public class FileMapperController {
     FileMapper should be able to look into registry and figure out fileNodes cluster information.
    */
   private final List<String> nodes = Arrays.asList(
-          "http://file-node-0.file-node:8080",
-          "http://file-node-1.file-node:8080",
-          "http://file-node-2.file-node:8080"
+          "file-node-0",
+          "file-node-1",
+          "file-node-2"
   );
 
+  public FileMapperController(ZookeeperAccessor zookeeperAccessor) {
+    this.zookeeperAccessor = zookeeperAccessor;
+  }
+
   @GetMapping("/listNodes")
-  public List<String> listNodes() {
-    return nodes;
+  public List<String> listHealthyNodes() throws Exception {
+    Map<String, String> fileNodeDetails = zookeeperAccessor.getAliveNodesWithData();
+    return fileNodeDetails.values().stream().toList();
   }
 
   /*

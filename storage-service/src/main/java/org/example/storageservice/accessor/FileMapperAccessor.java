@@ -14,7 +14,8 @@ public class FileMapperAccessor {
 
   private String baseUrl = "http://filemapper:8080"; // kubernetes should be able to resolve it automatically.
 
-  public String getNodeUrlForFile(String filename) {
+  public String getNodeIdForFile(String filename) {
+
     String url = String.format("%s/getNodeForFile?filename=%s", baseUrl, filename);
 
     HttpHeaders headers = new HttpHeaders();
@@ -32,7 +33,7 @@ public class FileMapperAccessor {
     return response.getBody();
   }
 
-  public List<String> getAllNodeUrlForFiles() {
+  public List<String> getAllHealthyNodeIdsForFiles() {
     String url = String.format("%s/listNodes", baseUrl);
 
     HttpHeaders headers = new HttpHeaders();

@@ -39,6 +39,8 @@ spec:
                   fieldPath: metadata.name
             - name: DATA_BASE_PATH
               value: /data
+            - name: ZK_CONNECT_STRING
+              value: "zookeeper:2181"
           volumeMounts:
             - name: file-node-storage
               mountPath: /data
@@ -86,6 +88,9 @@ spec:
           imagePullPolicy: Never
           ports:
             - containerPort: 8080
+          env:
+            - name: ZK_CONNECT_STRING
+              value: "zookeeper:2181"
 
 ---
 # 🟢 Stateless Service for storageservice
