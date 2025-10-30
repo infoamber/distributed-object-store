@@ -76,6 +76,5 @@ kubectl delete pod -l app=storage-service
 
 echo "✅ All services restarted with latest images."
 
-echo "🌀 Exposing storage service to outside world to test apis"
+echo "⏳ Waiting for pods to be ready..."
 
-kubectl port-forward svc/storage-service 8080:8080

@@ -1,9 +1,11 @@
 package org.example.filemapper;
 import org.example.filemapper.accessor.ZookeeperAccessor;
+import org.example.filemapper.clusterMap.ClusterMap;
+import org.example.filemapper.clusterMap.ClusterMapBuilder;
+import org.example.filemapper.clusterMap.TokenRangeFinder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -13,6 +15,9 @@ public class FileMapperController {
   @Autowired
   private final ZookeeperAccessor zookeeperAccessor;
 
+  @Autowired
+  private final TokenRangeFinder tokenRangeFinder;
+
   /*
     Currently  this is hardcoded values as per configuration and pods in File node service.
     We know the sticky dns for the nodes. This File mapper service will be running in same kube cluster,
@@ -21,17 +26,13 @@ public class FileMapperController {
     As a followup, FileNodes should register themselves in a service registry and announce their ip or so,
     FileMapper should be able to look into registry and figure out fileNodes cluster information.
    */
-  private final List<String> nodes = Arrays.asList(
-          "file-node-0",
-          "file-node-1",
-          "file-node-2"
-  );
 
-  public FileMapperController(ZookeeperAccessor zookeeperAccessor) {
+  public FileMapperController(ZookeeperAccessor zookeeperAccessor, TokenRangeFinder tokenRangeFinder) {
     this.zookeeperAccessor = zookeeperAccessor;
+    this.tokenRangeFinder = tokenRangeFinder;
   }
 
-  @GetMapping("/listNodes")
+  @GetMapping("/listHealthyNodes")
   public List<String> listHealthyNodes() throws Exception {
     Map<String, String> fileNodeDetails = zookeeperAccessor.getAliveNodesWithData();
     return fileNodeDetails.values().stream().toList();
@@ -39,14 +40,18 @@ public class FileMapperController {
 
   /*
     Returns nodes address, where file should be kept of read from.
-    TODO : Update logic to return replica nodes as well.
+    TODO : Update logic to fetch node from cluster map.
    */
   @GetMapping("/getNodeForFile")
-  public String getNodeForFile(@RequestParam(name = "filename", required = true) String filename) {
-    // Currently a simple implementation to decide node based on fileName
-    // Later we will move to persist uuid mapping or deterministic uuid generation options.
-    int hash = Math.abs(filename.hashCode());
-    String node = nodes.get(hash % nodes.size()); // Simple hash based for now. Later we will move to consistent hashing or other options.
-    return node;
+  public String getNodeForFile(@RequestParam(name = "filename", required = true) String filename) throws Exception {
+    return tokenRangeFinder.findOwner(filename);
+
+  }
+
+  @PostMapping("/buildClusterMap")
+  public String buildClusterMap() throws Exception {
+    ClusterMap clusterMap = ClusterMapBuilder.buildClusterMap();
+    zookeeperAccessor.storeClusterMap(clusterMap);
+    return  clusterMap.toString();
   }
 }

@@ -17,7 +17,7 @@ metadata:
   name: file-node
 spec:
   serviceName: "file-node"
-  replicas: 3
+  replicas: 6
   selector:
     matchLabels:
       app: file-node

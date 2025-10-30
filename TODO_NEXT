@@ -1,0 +1,7 @@
+# Read or write should not hit ZK for each call to fetch cluster map.
+It should be cached and updated when clustermap is updated. Implement lister in filemapper service for custermap changes.
+
+# Implement addition of nodes in clustermap.
+# Handle reads and writes when CM updated but data movement not done yet.
+# Implement data movement.
+# Implement read write handling before, midway and after data movement.

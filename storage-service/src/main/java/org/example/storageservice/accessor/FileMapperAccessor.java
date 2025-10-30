@@ -34,7 +34,7 @@ public class FileMapperAccessor {
   }
 
   public List<String> getAllHealthyNodeIdsForFiles() {
-    String url = String.format("%s/listNodes", baseUrl);
+    String url = String.format("%s/listHealthyNodes", baseUrl);
 
     HttpHeaders headers = new HttpHeaders();
     headers.setContentType(MediaType.APPLICATION_JSON);
